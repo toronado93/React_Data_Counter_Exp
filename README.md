@@ -1,70 +1,89 @@
-# Getting Started with Create React App
+Transfering data between sibling components 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+//APP.JS
 
-## Available Scripts
+import { useState } from "react";
 
-In the project directory, you can run:
+// const currentDate = new Date();
+// const futureDate = new Date(currentDate);
+// futureDate.setDate(currentDate.getDate() + count);
 
-### `npm start`
+function App() {
+  // Transfering Data between components
+  // lifting state to a common parent components and passing data down as props to the siblings.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  let [sliderValue, setSliderValue] = useState(1);
+  let [inputValue, setInputValue] = useState(0);
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  // Date
 
-### `npm test`
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + inputValue);
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  const handleSliderChange = (event) => {
+    setSliderValue(event.target.value);
+  };
 
-### `npm run build`
+  const handlePusherDecrease = (event) => {
+    return inputValue - sliderValue < 0
+      ? setInputValue(0)
+      : setInputValue(Number(inputValue) - Number(sliderValue));
+  };
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  const handlePusherIncrease = (event) => {
+    setInputValue(Number(inputValue) + Number(sliderValue));
+  };
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return (
+    <div style={{ textAlign: "center" }}>
+      <Slider
+        onDataChange={handleSliderChange}
+        slider_value={sliderValue}
+      ></Slider>
+      <Pusher
+        value={inputValue}
+        onDataClick={[handlePusherDecrease, handlePusherIncrease]}
+      ></Pusher>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+      <p>
+        {inputValue === 0
+          ? `Today is ${futureDate.toLocaleDateString()}`
+          : `${inputValue} days from today is ${futureDate.toLocaleDateString()}`}
+        ;
+      </p>
+    </div>
+  );
+}
 
-### `npm run eject`
+function Pusher(props) {
+  return (
+    <div>
+      <button onClick={props.onDataClick[0]}>-</button>
+      <input value={props.value}></input>
+      <button onClick={props.onDataClick[1]}>+</button>
+    </div>
+  );
+}
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+function Slider(props) {
+  // State
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  // Handler
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  return (
+    <>
+      <input
+        onChange={props.onDataChange}
+        type="range"
+        min="0"
+        max="9"
+        value={props.slider_value}
+        class="slider"
+        id="mySlider"
+      ></input>
+      {props.slider_value}
+    </>
+  );
+}
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default App;
